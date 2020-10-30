@@ -53,7 +53,7 @@ public class CreateAccountController extends HttpServlet {
             
         } catch (SQLException |NoSuchAlgorithmException| NamingException ex) {
             if(ex instanceof SQLException && ex.getMessage().contains("duplicate")){
-                
+                request.setAttribute("EXISTED", "EXISTED");
             }
             LOGGER.error(ex.getMessage());
         }finally{
@@ -74,7 +74,7 @@ public class CreateAccountController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.sendRedirect(Constants.CREATE_ACCOUNT_PAGE);
     }
 
     /**

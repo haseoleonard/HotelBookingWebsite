@@ -10,8 +10,6 @@ package nghiadhse140362.utils;
  * @author haseo
  */
 public abstract class Constants {
-    public static final String DB_USERNAME = "sa";
-    public static final String DB_PASSWORD = "14021998";
     //
     public static final String LOGIN_PAGE="login.jsp";
     public static final String CREATE_ACCOUNT_PAGE = "createaccount.jsp";

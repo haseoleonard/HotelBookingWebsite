@@ -20,7 +20,7 @@ public abstract class DBHelpers{
     public static Connection makeConnection() throws NamingException, SQLException{
         Context curContext = new InitialContext();
         Context tomcatContext = (Context) curContext.lookup("java:comp/env");
-        DataSource ds = (DataSource) tomcatContext.lookup("");
-        return ds.getConnection(Constants.DB_USERNAME, Constants.DB_PASSWORD);
+        DataSource ds = (DataSource) tomcatContext.lookup("HotelBookingDB");
+        return ds.getConnection();
     }
 }

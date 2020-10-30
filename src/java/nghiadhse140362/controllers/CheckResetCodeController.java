@@ -6,12 +6,18 @@
 package nghiadhse140362.controllers;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.SQLException;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import nghiadhse140362.daos.UserAuthenticationDAO;
+import nghiadhse140362.daos.UsersDAO;
+import nghiadhse140362.utils.Constants;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -19,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "CheckResetCodeController", urlPatterns = {"/CheckResetCodeController"})
 public class CheckResetCodeController extends HttpServlet {
-
+    private static final Logger LOGGER = Logger.getLogger(CheckResetCodeController.class);
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -32,17 +38,34 @@ public class CheckResetCodeController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet CheckResetCodeController</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet CheckResetCodeController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        boolean valid = false;
+        try{
+            String verifyCode = request.getParameter("txtVerifyCode");
+            String newPassword = request.getParameter("txtPassword");
+            if(verifyCode!=null&&!verifyCode.trim().isEmpty()&&verifyCode.length()==6){
+                HttpSession session = request.getSession(false);
+                if(session!=null){
+                    String resetEmail = (String) session.getAttribute("RESET_EMAIL");
+                    if(resetEmail!=null){
+                        UserAuthenticationDAO dao = new UserAuthenticationDAO();
+                        valid=dao.checkAuthCode(resetEmail, verifyCode);
+                        if(!valid){
+                            dao.deleteTimeOutAuthCode();
+                        }else{
+                            UsersDAO usersDAO = new UsersDAO();
+                            usersDAO.updatePassword(resetEmail, newPassword);
+                        }
+                    }
+                }
+            }
+        } catch (SQLException | NamingException ex) {
+            LOGGER.error(response);
+        }finally{
+            if(valid)response.sendRedirect(Constants.LOGIN_PAGE);
+            else{
+                request.setAttribute("INVALID_CODE", "Invalid Verify Code");
+                request.getRequestDispatcher(Constants.RESET_PASSWORD_PAGE).forward(request, response);
+            }
         }
     }
 
@@ -58,7 +81,7 @@ public class CheckResetCodeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.sendRedirect(Constants.RESET_PASSWORD_PAGE);
     }
 
     /**

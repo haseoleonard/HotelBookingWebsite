@@ -31,7 +31,9 @@ public class ServletContextListener implements javax.servlet.ServletContextListe
         Map<String, String> resourceMap = new HashMap<>();
         resourceMap.put("", Constants.HOME_PAGE);
         resourceMap.put("login", "LoginController");
+        resourceMap.put("create", "CreateAccountController");
         resourceMap.put("logout", "LogoutController");
+        resourceMap.put("search", "SearchRoomController");
         resourceMap.put("sendemail", "SendResetPasswordEmailController");
         resourceMap.put("checkcode", "CheckResetCodeController");
         context.setAttribute("RESOURCE_MAP", resourceMap);

@@ -2,5 +2,6 @@
 <Context path="/HotelBooking">
     <Resource name="HotelBookingDB" type="javax.sql.DataSource" auth="Container"
     driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
-    url="jdbc:sqlserver://localhost:1433;databaseName=HotelBookingDB"/>
+    url="jdbc:sqlserver://localhost:1433;databaseName=HotelBookingDB"
+    username="sa" password="14021998"/>
 </Context>

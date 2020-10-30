@@ -6,7 +6,11 @@
 package nghiadhse140362.controllers;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.logging.Level;
+import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import nghiadhse140362.daos.UserAuthenticationDAO;
 import nghiadhse140362.daos.UsersDAO;
 import nghiadhse140362.utils.Constants;
 import nghiadhse140362.utils.EncodingHelpers;
@@ -46,11 +51,17 @@ public class SendResetPasswordEmailController extends HttpServlet {
                 if(dao.checkEmailExisted(username)){
                     HttpSession session = request.getSession();
                     session.setAttribute("RESET_EMAIL", username);
+                    UserAuthenticationDAO uaDao = new UserAuthenticationDAO();
+                    if(uaDao.createAuthenRecord(username, EncodingHelpers.generateNewVerificationCode())){
+                        Timestamp timeout = uaDao.getAuthCodeTimeOutDate(username);
+                        String authCode = uaDao.getAuthCode();
+                        MailHelpers.sendVerificationEmail(username, authCode, timeout);
+                    }
                 }else{
                     request.setAttribute("NOT_EXISTED", "NOT_EXISTED");
                 }
             }
-        } catch (NamingException | SQLException ex) {
+        } catch (NamingException | SQLException | MessagingException | UnsupportedEncodingException ex) {
             LOGGER.error(ex.getMessage());
         }finally{
             request.getRequestDispatcher(Constants.RESET_PASSWORD_PAGE).forward(request, response);

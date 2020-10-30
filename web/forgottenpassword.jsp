@@ -24,11 +24,33 @@
             </form>
         </c:if>
         <c:if test="${not empty sessionScope.RESET_EMAIL}">
+            <h3></h3>
             <form action="checkcode" method="post">
-                <input type="text" name="txtCode" value="${param.txtCode}"/>
-                <input type="password" name="txtPassword" value=""/>
-                <button type="submit">Submit</button>
-            </form>
+                Your Verification Code<input type="text" name="txtCode" value="${param.txtCode}"/>
+                <c:if test="${not empty requestScope.INVALID_CODE}">${requestScope.INVALID_CODE}</c:if>
+                    New Password<input type="password" id="password" id="confirm" name="txtPassword" value="" required maxlength="64"/>
+                    <div id="passwordErr" style="color: red"></div>
+                    Confirm<input type="password" name="txtConfirm" value="" required/>
+                    <div id="confirmErr" style="color: red"></div>
+                    <button type="submit">Submit</button>
+                </form>
         </c:if>
+        <script>
+            function checkPassword() {
+                let valid = true;
+                document.getElementById("passwordErr").innerHTML = "";
+                document.getElementById("confirmErr").innerHTML = "";
+                let password = document.getElementById("password").value;
+                let confirm = document.getElementById("confirm").value;
+                if(password.trim().length<6||password.trim().length>64){
+                    valid=false;
+                    document.getElementById("passwordErr").innerHTML="Invalid Password";
+                }else if(password.trim() !== confirm.trim()){
+                    valid=false;
+                    document.getElementById("confirmErr").innerHTML="Confirm Not Match";
+                }
+                return valid;
+            }
+        </script>
     </body>
 </html>
